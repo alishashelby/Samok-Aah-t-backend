@@ -1,0 +1,410 @@
+openapi: 3.0.3
+info:
+  title: Shared Models
+  version: "1.0.0"
+
+components:
+  schemas:
+    RegisterDTO:
+      type: object
+      required: [ email, password, role ]
+      properties:
+        email:
+          type: string
+          format: email
+          example: test@mail.com
+          x-oapi-codegen-extra-tags:
+            validate: "required,email"
+        password:
+          type: string
+          minLength: 8
+          maxLength: 15
+          example: "1234567c"
+          x-oapi-codegen-extra-tags:
+            validate: "required,min=8,max=15,alphanum"
+        role:
+          type: string
+          enum: [ CLIENT, MODEL, ADMIN ]
+          x-oapi-codegen-extra-tags:
+            validate: "required,oneof=CLIENT MODEL ADMIN"
+
+    LoginDTO:
+      type: object
+      required: [ email, password ]
+      properties:
+        email:
+          type: string
+          format: email
+          x-oapi-codegen-extra-tags:
+            validate: "required,email"
+        password:
+          type: string
+          minLength: 8
+          maxLength: 15
+          x-oapi-codegen-extra-tags:
+            validate: "required,min=8,max=15"
+
+    AuthTokenResponse:
+      type: object
+      required:
+        - access_token
+      properties:
+        access_token:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required: [ code, message ]
+      properties:
+        code:
+          type: string
+          enum:
+            - BAD_REQUEST
+            - VALIDATION_ERROR
+            - UNAUTHORIZED
+            - FORBIDDEN
+            - NOT_FOUND
+            - EMAIL_ALREADY_EXISTS
+            - INVALID_CREDENTIALS
+            - NOT_A_MODEL
+            - SERVICE_NOT_FOUND
+            - SERVICE_NOT_ACTIVE
+            - NOT_SERVICE_OWNER
+            - SLOT_OVERLAP
+            - INVALID_SLOT_STATUS_TRANSITION
+            - SLOT_NOT_AVAILABLE
+            - NOT_SLOT_OWNER
+            - INCORRECT_SLOT_TIME
+            - NOT_ADMIN
+            - INTERNAL_ERROR
+            - BOOKING_NOT_FOUND
+            - ORDER_NOT_FOUND
+            - BOOKING_EXPIRED
+            - BOOKING_ALREADY_PROCESSED
+            - INVALID_BOOKING_STATE
+            - CANNOT_CANCEL_ORDER
+            - CANNOT_COMPLETE_ORDER
+            - INVALID_PRICE
+            - DESCRIPTION_TOO_LONG
+            - SLOTNOTFOUND
+            - NOTCLIENT
+            - USERISNOTANADULT
+        message:
+          type: string
+          example: "email already exists"
+
+    UserDTO:
+      type: object
+      required: [ name, birth_date ]
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 30
+          x-oapi-codegen-extra-tags:
+            validate: "required,min=2,max=30"
+        birth_date:
+          type: string
+          format: date
+          x-go-type: string
+          example: 2000-01-02
+          x-oapi-codegen-extra-tags:
+            validate: "required,datetime=2006-01-02"
+
+    UserUpdateDTO:
+      type: object
+      required: [ name ]
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 30
+          x-oapi-codegen-extra-tags:
+            validate: "required,min=2,max=30"
+
+    UserResponse:
+      type: object
+      required: [ id, name, birth_date, is_verified ]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        birth_date:
+          type: string
+          format: date
+        is_verified:
+          type: boolean
+
+    AnotherUserResponse:
+      type: object
+      required: [ name, is_verified ]
+      properties:
+        name:
+          type: string
+        is_verified:
+          type: boolean
+
+    ModelServiceCreateDTO:
+      type: object
+      required: [ title, description, price ]
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+          x-oapi-codegen-extra-tags:
+            validate: "required,min=3,max=100"
+        description:
+          type: string
+          maxLength: 1000
+          x-oapi-codegen-extra-tags:
+            validate: "required,max=1000"
+        price:
+          type: number
+          format: float
+          minimum: 0.01
+          x-oapi-codegen-extra-tags:
+            validate: "required,gt=0"
+
+    ModelServiceUpdateDTO:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+          x-oapi-codegen-extra-tags:
+            validate: "required,min=3,max=100"
+        description:
+          type: string
+          maxLength: 1000
+          x-oapi-codegen-extra-tags:
+            validate: "required,max=1000"
+        price:
+          type: number
+          format: float
+          minimum: 0.01
+          x-oapi-codegen-extra-tags:
+            validate: "required,gt=0"
+
+    ModelServiceResponse:
+      type: object
+      required: [ id, model_id, title, description, price, is_active, created_at ]
+      properties:
+        id:
+          type: integer
+          format: int64
+        model_id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    StatusResponse:
+      type: object
+      required: [ status ]
+      properties:
+        status:
+          type: string
+
+    BookingStatus:
+      type: string
+      enum: [ PENDING, APPROVED, REJECTED, CANCELLED ]
+
+    Address:
+      type: object
+      required: [ street, house ]
+      properties:
+        street:
+          type: string
+          minLength: 1
+          x-oapi-codegen-extra-tags:
+            validate: "required,min=1"
+        house:
+          type: integer
+          x-oapi-codegen-extra-tags:
+            validate: "required,gt=0"
+        apartment:
+          type: integer
+          nullable: true
+          x-oapi-codegen-extra-tags:
+            validate: "omitempty,gt=0"
+        entrance:
+          type: integer
+          nullable: true
+          x-oapi-codegen-extra-tags:
+            validate: "omitempty,gt=0"
+        floor:
+          type: integer
+          nullable: true
+          x-oapi-codegen-extra-tags:
+            validate: "omitempty,gt=0"
+        comment:
+          type: string
+          nullable: true
+          x-oapi-codegen-extra-tags:
+            validate: "omitempty,max=500"
+
+    BookingResponse:
+      type: object
+      required:
+        - id
+        - clientID
+        - modelServiceID
+        - slotID
+        - address
+        - status
+        - createdAt
+        - expiresAt
+      properties:
+        id:
+          type: integer
+          format: int64
+        clientID:
+          type: integer
+          format: int64
+        modelServiceID:
+          type: integer
+          format: int64
+        slotID:
+          type: integer
+          format: int64
+        address:
+          $ref: "#/components/schemas/Address"
+        status:
+          $ref: "#/components/schemas/BookingStatus"
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+
+    BookingRequest:
+      type: object
+      required: [ modelServiceID, slotID, address ]
+      properties:
+        modelServiceID:
+          type: integer
+          format: int64
+          x-oapi-codegen-extra-tags:
+            validate: "required,gt=0"
+        slotID:
+          type: integer
+          format: int64
+          x-oapi-codegen-extra-tags:
+            validate: "required,gt=0"
+        address:
+          $ref: "#/components/schemas/Address"
+
+    UpdateBookingStatusRequest:
+      type: object
+      required: [ status ]
+      properties:
+        status:
+          type: string
+          enum: [ APPROVED, REJECTED ]
+          x-oapi-codegen-extra-tags:
+            validate: "required,oneof=APPROVED REJECTED"
+
+    SlotStatus:
+      type: string
+      enum: [ AVAILABLE, DISABLED, RESERVED, BOOKED ]
+
+    SlotResponse:
+      type: object
+      required:
+        - id
+        - modelId
+        - startTime
+        - endTime
+        - status
+        - createdAt
+      properties:
+        id:
+          type: integer
+          format: int64
+        modelId:
+          type: integer
+          format: int64
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        status:
+          $ref: "#/components/schemas/SlotStatus"
+        createdAt:
+          type: string
+          format: date-time
+
+    Admin:
+      type: object
+      required: [ id, authID, permissions ]
+      properties:
+        id:
+          type: integer
+          format: int64
+          x-oapi-codegen-extra-tags:
+            validate: "required,gt=0"
+        authID:
+          type: integer
+          format: int64
+          x-oapi-codegen-extra-tags:
+            validate: "required,gt=0"
+        permissions:
+          type: object
+          additionalProperties:
+            type: boolean
+          x-oapi-codegen-extra-tags:
+            validate: "required,dive,keys,required,endkeys,required"
+
+    UpdateStatusRequest:
+      type: object
+      required: [ status ]
+      properties:
+        status:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: "required,min=1,max=100"
+
+    OrderStatus:
+      type: string
+      enum:
+        - CONFIRMED
+        - INTRANSIT
+        - COMPLETED
+        - CANCELLED
+
+    OrderResponse:
+      type: object
+      required:
+        - id
+        - bookingID
+        - status
+        - createdAt
+      properties:
+        id:
+          type: integer
+          format: int64
+        bookingID:
+          type: integer
+          format: int64
+        status:
+          $ref: "#/components/schemas/OrderStatus"
+        createdAt:
+          type: string
+          format: date-time

@@ -1,0 +1,4 @@
+logger:
+  level: "debug"
+  logs-dir: "/app/logs"
+  logs-file: "app.log"

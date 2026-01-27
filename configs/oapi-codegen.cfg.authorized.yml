@@ -1,0 +1,13 @@
+package: authorized
+output: ../generated/authorized/authorized.gen.go
+
+generate:
+  gorilla-server: true
+  models: true
+  strict-server: true
+
+output-options:
+  skip-prune: true
+
+import-mapping:
+  openapi-models.yml: github.com/alishashelby/Samok-Aah-t/backend/internal/app/api/generated/models

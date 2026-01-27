@@ -1,0 +1,1257 @@
+openapi: 3.0.3
+info:
+  title: Final Project API
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:8080
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /users:
+    post:
+      summary: Give client/model more personal info
+      tags: [ User ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "openapi-models.yml#/components/schemas/UserDTO"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/UserResponse"
+        "400":
+          description: Invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+
+  /users/me:
+    patch:
+      summary: Update profile
+      tags: [ User ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "openapi-models.yml#/components/schemas/UserUpdateDTO"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/UserResponse"
+        "400":
+          description: Invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+
+    get:
+      summary: Get profile
+      tags: [ User ]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/UserResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+
+  /users/{id}:
+    get:
+      summary: Get user by id
+      tags: [ User ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/AnotherUserResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+
+  /client/services:
+    get:
+      summary: Client gets all active services with pagination
+      tags: [ Service ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            maximum: 40
+            default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "openapi-models.yml#/components/schemas/ModelServiceResponse"
+        "400":
+          description: Invalid pagination params
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+
+  /client/services/{id}:
+    get:
+      summary: Client gets service by id
+      tags: [ Service ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ModelServiceResponse"
+        "400":
+          description: Invalid ID
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: Service not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+
+  /model/services:
+    post:
+      summary: Model creates new service
+      tags: [ Service ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "openapi-models.yml#/components/schemas/ModelServiceCreateDTO"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ModelServiceResponse"
+        "400":
+          description: Invalid JSON
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+
+    get:
+      summary: Model gets all their services
+      tags: [ Service ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            maximum: 40
+            default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "openapi-models.yml#/components/schemas/ModelServiceResponse"
+        "400":
+          description: Invalid pagination params
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+
+  /model/services/{id}:
+    patch:
+      summary: Model updates service by id
+      tags: [ Service ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "openapi-models.yml#/components/schemas/ModelServiceUpdateDTO"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ModelServiceResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "403":
+          description: Not service owner
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "409":
+          description: Service not active
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+
+  /model/services/{id}/deactivate:
+    patch:
+      summary: Model deactivates service by id
+      tags: [ Service ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Deactivated
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/StatusResponse"
+        "400":
+          description: Invalid ID
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "403":
+          description: Not service owner
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "409":
+          description: Service already inactive
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal error
+
+  /client/bookings:
+    post:
+      summary: Client creates booking - books a slot
+      tags:
+        - Client
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "openapi-models.yml#/components/schemas/BookingRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/BookingResponse"
+        "409":
+          description: Slot already reserved
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "422":
+          description: Invalid date or slot in the past
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+          
+  /client/bookings/{id}/cancel:
+    patch:
+      summary: Client cancels a booking - only their own Pending booking
+      tags:
+        - Client
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Booking cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/BookingResponse"
+        "403":
+          description: Client tried to cancel someone else"s booking
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "409":
+          description: Cannot cancel a booking not in Pending status
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+  /model/bookings/{id}/approve:
+    patch:
+      summary: Model approves a booking - a Pending booking if they own the service
+      tags:
+        - Model
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Booking approved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/BookingResponse"
+        "403":
+          description: Model does not own this service
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "409":
+          description: Booking already processed or not Pending
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+  /model/bookings/{id}/reject:
+    patch:
+      summary: Model rejects a booking - a Pending booking if they own the service
+      tags:
+        - Model
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Booking rejected successfully
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/BookingResponse"
+        "403":
+          description: Model does not own this service
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "409":
+          description: Booking already processed or not Pending
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+  /model/slots:
+    post:
+      summary: Model can create a slot for booking
+      tags:
+        - Model
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - start
+                - end
+              properties:
+                start:
+                  type: string
+                  format: date-time
+                end:
+                  type: string
+                  format: date-time
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/SlotResponse"
+        "403":
+          description: Model not verified
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "409":
+          description: Slot overlaps with another slot
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+    get:
+      summary: Model can get all of their slots
+      tags:
+        - Model
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "openapi-models.yml#/components/schemas/SlotResponse"
+        "403":
+          description: Not verified model
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+  
+  /model/slots/{slotId}:
+    patch:
+      summary: Model can update start, end of their own slot.
+      tags:
+        - Model
+      parameters:
+        - name: slotId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start:
+                  type: string
+                  format: date-time
+                end:
+                  type: string
+                  format: date-time
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/SlotResponse"
+        "403":
+          description: Not owner of the slot or not verified
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "409":
+          description: Slot overlap or invalid status transition
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+  /model/slots/{slotId}/disable:
+    patch:
+      summary: Model can deactivate a slot.
+      tags:
+        - Model
+      parameters:
+        - name: slotId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Disabled
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/SlotResponse"
+        "403":
+          description: Not owner or not verified
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "409":
+          description: Slot already disabled or booked
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+  /client/models/{modelId}/slots:
+    get:
+      summary: Client can get available slots of a given model. Disabled slots are filtered out.
+      tags:
+        - Client
+      parameters:
+        - name: modelId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "openapi-models.yml#/components/schemas/SlotResponse"
+        "403":
+          description: Not verified client
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: Model not found or has no slots
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+                
+  /admin/users:
+    get:
+      summary: Admin gets all users with full personal information
+      tags: [ Admin ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            format: int64
+            maximum: 40
+            default: 20
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "openapi-models.yml#/components/schemas/UserResponse"
+        "403":
+          description: Not admin
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+  /admin/users/{id}/verify:
+    patch:
+      summary: Admin verifies a user (client or model)
+      tags: [ Admin ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Verified
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/UserResponse"
+        "403":
+          description: Not admin
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+  /admin/bookings:
+    get:
+      summary: Admin gets all bookings
+      tags: [ Admin ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            format: int64
+            maximum: 40
+            default: 20
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "openapi-models.yml#/components/schemas/BookingResponse"
+        "403":
+          description: Not admin
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+  /admin/bookings/{id}/status:
+    patch:
+      summary: Admin can update booking status (including cancellation <24h)
+      tags: [ Admin ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "openapi-models.yml#/components/schemas/UpdateStatusRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/BookingResponse"
+        "403":
+          description: Not admin
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+  /admin/orders:
+    get:
+      summary: Admin gets all orders
+      tags: [ Admin ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            format: int64
+            maximum: 40
+            default: 20
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "openapi-models.yml#/components/schemas/OrderResponse"
+        "403":
+          description: Not admin
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+  /admin/orders/{id}/status:
+    patch:
+      summary: Admin can update order status (including cancellation <24h)
+      tags: [ Admin ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "openapi-models.yml#/components/schemas/UpdateStatusRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/OrderResponse"
+        "403":
+          description: Not admin
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+                
+  /admin:
+    post:
+      summary: Admin can create a new admin with permissions
+      tags: [ Admin ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ authId, permissions ]
+              properties:
+                authId:
+                  type: integer
+                  format: int64
+                permissions:
+                  type: object
+                  additionalProperties:
+                    type: boolean
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/Admin"
+        "403":
+          description: Not admin
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+
+  /admin/{id}:
+    get:
+      summary: Admin can get another admin by id
+      tags: [ Admin ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/Admin"
+        "403":
+          description: Not admin
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: Admin not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+                
+    patch:
+      summary: Admin can update another admin permissions
+      tags: [ Admin ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ permissions ]
+              properties:
+                permissions:
+                  type: object
+                  additionalProperties:
+                    type: boolean
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/Admin"
+        "403":
+          description: Not admin
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: Admin not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+  
+  /admin/bookings/{id}:
+    get:
+      summary: Admin gets booking by id
+      tags: [ Admin ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/BookingResponse"
+        "403":
+          description: Not admin
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+                
+  /admin/orders/{id}:
+    get:
+      summary: Admin gets order by id
+      tags: [ Admin ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/OrderResponse"
+        "403":
+          description: Not admin
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+                
+  /model/orders:
+    get:
+      summary: Model gets all their orders
+      tags: [ Order, Model ]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            format: int64
+            maximum: 40
+            default: 20
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "openapi-models.yml#/components/schemas/OrderResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "403":
+          description: Not a model
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+                
+  /model/orders/{id}/cancel:
+    patch:
+      summary: Model can cancel their order
+      tags: [ Order, Model ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Order cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/OrderResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "403":
+          description: Not model or not owner
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "409":
+          description: Cannot cancel order now
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+                
+  /model/orders/{id}/complete:
+    patch:
+      summary: Model completes their order
+      tags: [ Order, Model ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Order completed
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/OrderResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "403":
+          description: Not model or not owner
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "400":
+          description: Invalid order status transition
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+                
+  /client/orders/{id}/cancel:
+    patch:
+      summary: Client can cancel their order 
+      tags: [ Order, Client ]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Order cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/OrderResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "403":
+          description: Not client or not owner
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "404":
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
+        "409":
+          description: Cannot cancel order now
+          content:
+            application/json:
+              schema:
+                $ref: "openapi-models.yml#/components/schemas/ErrorResponse"
