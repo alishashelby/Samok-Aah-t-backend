@@ -878,9 +878,6 @@ func TestModelServiceService_CheckPayloadRestrictions(t *testing.T) {
 }
 
 func TestModelServiceService_CreateService_PayloadValidationIntegration(t *testing.T) {
-	test := setUpModelServiceServiceTest(t)
-	defer test.ctrl.Finish()
-
 	ctxModel := context.WithValue(context.Background(), service_const.AuthIDKey, int64(1))
 	ctxModel = context.WithValue(ctxModel, service_const.RoleKey, "MODEL")
 
@@ -898,6 +895,7 @@ func TestModelServiceService_CreateService_PayloadValidationIntegration(t *testi
 		mockSaveErr   error
 		expectedError error
 		expectSave    bool
+		expectGetUser bool
 	}{
 		{
 			name:          "successful creation with valid payload",
@@ -905,6 +903,7 @@ func TestModelServiceService_CreateService_PayloadValidationIntegration(t *testi
 			description:   "Valid description",
 			price:         100.0,
 			expectSave:    true,
+			expectGetUser: true,
 			expectedError: nil,
 		},
 		{
@@ -913,6 +912,7 @@ func TestModelServiceService_CreateService_PayloadValidationIntegration(t *testi
 			description:   "Valid description",
 			price:         0,
 			expectSave:    false,
+			expectGetUser: false,
 			expectedError: service_errors.ErrInvalidPrice,
 		},
 		{
@@ -938,17 +938,23 @@ func TestModelServiceService_CreateService_PayloadValidationIntegration(t *testi
 			price:         100.0,
 			mockSaveErr:   errors.New("database error"),
 			expectSave:    true,
+			expectGetUser: true,
 			expectedError: errors.New("database error"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			test := setUpModelServiceServiceTest(t)
+			defer test.ctrl.Finish()
+
 			authID := ctxModel.Value(service_const.AuthIDKey).(int64)
-			test.userRepo.EXPECT().
-				GetByAuthID(gomock.Any(), authID).
-				Return(verifiedModel, nil).
-				Times(1)
+			if tt.expectGetUser {
+				test.userRepo.EXPECT().
+					GetByAuthID(gomock.Any(), authID).
+					Return(verifiedModel, nil).
+					Times(1)
+			}
 
 			if tt.expectSave {
 				test.modelServiceRepo.EXPECT().

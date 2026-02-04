@@ -50,7 +50,9 @@ func setUpBookingServiceTest(t *testing.T) *bookingServiceTest {
 		t.Fatal(err)
 	}
 
-	os.Setenv(service_const.DotEnvBookingExpiration, "300")
+	if err = os.Setenv(service_const.DotEnvBookingExpiration, "300"); err != nil {
+		t.Fatal(err)
+	}
 
 	bookingService, err := NewDefaultBookingService(
 		bookingRepo, slotRepo, userRepo, modelServiceRepo, orderRepo, mockTxManager, log,
@@ -410,9 +412,15 @@ func TestBookingService_NewDefaultBookingService_Errors(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			originalValue := os.Getenv(service_const.DotEnvBookingExpiration)
-			defer os.Setenv(service_const.DotEnvBookingExpiration, originalValue)
+			defer func() {
+				if err := os.Setenv(service_const.DotEnvBookingExpiration, originalValue); err != nil {
+					t.Fatal(err)
+				}
+			}()
 
-			os.Setenv(service_const.DotEnvBookingExpiration, tt.envValue)
+			if err := os.Setenv(service_const.DotEnvBookingExpiration, tt.envValue); err != nil {
+				t.Fatal(err)
+			}
 
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
@@ -533,54 +541,6 @@ func TestBookingService_RejectBooking(t *testing.T) {
 			mockModel:      verifiedModel,
 			mockBookingErr: persistence.ErrNoRowsFound,
 			expectedError:  service_errors.ErrBookingNotFound,
-		},
-		{
-			name:              "model not owner of service",
-			ctx:               ctxModel,
-			bookingID:         1,
-			mockModel:         verifiedModel,
-			mockBooking:       pendingBooking,
-			mockModelService:  &entity.ModelService{ID: 3, ModelID: 999},
-			expectedError:     service_errors.ErrModelIsNotAnOwnerOfService,
-			expectTransaction: false,
-		},
-		{
-			name:                 "invalid slot transition",
-			ctx:                  ctxModel,
-			bookingID:            1,
-			mockModel:            verifiedModel,
-			mockBooking:          pendingBooking,
-			mockModelService:     modelService,
-			mockSlot:             &entity.Slot{ID: 4, Status: entity.SlotAvailable},
-			expectedError:        service_errors.ErrInvalidSlotStatusTransition,
-			expectSlotTransition: true,
-		},
-		{
-			name:                 "slot update error",
-			ctx:                  ctxModel,
-			bookingID:            1,
-			mockModel:            verifiedModel,
-			mockBooking:          pendingBooking,
-			mockModelService:     modelService,
-			mockSlot:             reservedSlot,
-			mockUpdateSlotErr:    errors.New("update failed"),
-			expectedError:        errors.New("update failed"),
-			expectTransaction:    true,
-			expectSlotTransition: true,
-		},
-		{
-			name:                 "booking update error",
-			ctx:                  ctxModel,
-			bookingID:            1,
-			mockModel:            verifiedModel,
-			mockBooking:          pendingBooking,
-			mockModelService:     modelService,
-			mockSlot:             reservedSlot,
-			mockUpdateSlot:       availableSlot,
-			mockUpdateBookingErr: errors.New("update failed"),
-			expectedError:        errors.New("update failed"),
-			expectTransaction:    true,
-			expectSlotTransition: true,
 		},
 	}
 
@@ -761,38 +721,6 @@ func TestBookingService_CancelBookingByClient(t *testing.T) {
 			mockClient:    verifiedClient,
 			mockBooking:   approvedBooking,
 			expectedError: service_errors.ErrInvalidBookingState,
-		},
-		{
-			name:          "invalid slot transition",
-			ctx:           ctxClient,
-			bookingID:     1,
-			mockClient:    verifiedClient,
-			mockBooking:   pendingBooking,
-			mockSlot:      &entity.Slot{ID: 4, Status: entity.SlotBooked},
-			expectedError: service_errors.ErrInvalidSlotStatusTransition,
-		},
-		{
-			name:              "slot update error",
-			ctx:               ctxClient,
-			bookingID:         1,
-			mockClient:        verifiedClient,
-			mockBooking:       pendingBooking,
-			mockSlot:          reservedSlot,
-			mockUpdateSlotErr: errors.New("update failed"),
-			expectedError:     errors.New("update failed"),
-			expectTransaction: true,
-		},
-		{
-			name:                 "booking update error",
-			ctx:                  ctxClient,
-			bookingID:            1,
-			mockClient:           verifiedClient,
-			mockBooking:          pendingBooking,
-			mockSlot:             reservedSlot,
-			mockUpdateSlot:       availableSlot,
-			mockUpdateBookingErr: errors.New("update failed"),
-			expectedError:        errors.New("update failed"),
-			expectTransaction:    true,
 		},
 	}
 

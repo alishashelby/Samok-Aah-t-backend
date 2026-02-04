@@ -26,12 +26,20 @@ func TestJWTService_NewJWTService(t *testing.T) {
 			secretEnv: "test-secret-key-very-long-for-testing-purposes-123",
 			ttlEnv:    "3600",
 			setupEnv: func() {
-				os.Setenv(service_const.DotEnvJWTSecret, "test-secret-key-very-long-for-testing-purposes-123")
-				os.Setenv(service_const.DotEnvJWTExpiration, "3600")
+				if err := os.Setenv(service_const.DotEnvJWTSecret, "test-secret-key-very-long-for-testing-purposes-123"); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.Setenv(service_const.DotEnvJWTExpiration, "3600"); err != nil {
+					t.Fatal(err)
+				}
 			},
 			cleanupEnv: func() {
-				os.Unsetenv(service_const.DotEnvJWTSecret)
-				os.Unsetenv(service_const.DotEnvJWTExpiration)
+				if err := os.Unsetenv(service_const.DotEnvJWTSecret); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.Unsetenv(service_const.DotEnvJWTExpiration); err != nil {
+					t.Fatal(err)
+				}
 			},
 		},
 		{
@@ -39,11 +47,17 @@ func TestJWTService_NewJWTService(t *testing.T) {
 			secretEnv: "test-secret",
 			ttlEnv:    "",
 			setupEnv: func() {
-				os.Setenv(service_const.DotEnvJWTSecret, "test-secret")
-				os.Unsetenv(service_const.DotEnvJWTExpiration)
+				if err := os.Setenv(service_const.DotEnvJWTSecret, "test-secret"); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.Unsetenv(service_const.DotEnvJWTExpiration); err != nil {
+					t.Fatal(err)
+				}
 			},
 			cleanupEnv: func() {
-				os.Unsetenv(service_const.DotEnvJWTSecret)
+				if err := os.Unsetenv(service_const.DotEnvJWTSecret); err != nil {
+					t.Fatal(err)
+				}
 			},
 			expectedError: service_errors.ErrLoadingTTL,
 		},
@@ -52,12 +66,20 @@ func TestJWTService_NewJWTService(t *testing.T) {
 			secretEnv: "test-secret",
 			ttlEnv:    "not-a-number",
 			setupEnv: func() {
-				os.Setenv(service_const.DotEnvJWTSecret, "test-secret")
-				os.Setenv(service_const.DotEnvJWTExpiration, "not-a-number")
+				if err := os.Setenv(service_const.DotEnvJWTSecret, "test-secret"); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.Setenv(service_const.DotEnvJWTExpiration, "not-a-number"); err != nil {
+					t.Fatal(err)
+				}
 			},
 			cleanupEnv: func() {
-				os.Unsetenv(service_const.DotEnvJWTSecret)
-				os.Unsetenv(service_const.DotEnvJWTExpiration)
+				if err := os.Unsetenv(service_const.DotEnvJWTSecret); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.Unsetenv(service_const.DotEnvJWTExpiration); err != nil {
+					t.Fatal(err)
+				}
 			},
 			expectedError: service_errors.ErrParsingTTL,
 		},
@@ -66,12 +88,20 @@ func TestJWTService_NewJWTService(t *testing.T) {
 			secretEnv: "test-secret",
 			ttlEnv:    "-1",
 			setupEnv: func() {
-				os.Setenv(service_const.DotEnvJWTSecret, "test-secret")
-				os.Setenv(service_const.DotEnvJWTExpiration, "-1")
+				if err := os.Setenv(service_const.DotEnvJWTSecret, "test-secret"); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.Setenv(service_const.DotEnvJWTExpiration, "-1"); err != nil {
+					t.Fatal(err)
+				}
 			},
 			cleanupEnv: func() {
-				os.Unsetenv(service_const.DotEnvJWTSecret)
-				os.Unsetenv(service_const.DotEnvJWTExpiration)
+				if err := os.Unsetenv(service_const.DotEnvJWTSecret); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.Unsetenv(service_const.DotEnvJWTExpiration); err != nil {
+					t.Fatal(err)
+				}
 			},
 			expectedError: service_errors.ErrNotPositiveTTL,
 		},
@@ -102,11 +132,21 @@ func TestJWTService_NewJWTService(t *testing.T) {
 }
 
 func TestJWTService_GenerateAndParseToken(t *testing.T) {
-	os.Setenv(service_const.DotEnvJWTSecret, "aeaebf84c8216bb5e45e2b18c78d8c26f9988ce31b26ecc7ee760f9e45c377cb")
-	os.Setenv(service_const.DotEnvJWTExpiration, "3600")
+	if err := os.Setenv(service_const.DotEnvJWTSecret, "aeaebf84c8216bb5e45e2b18c78d8c26f9988ce31b26ecc7ee760f9e45c377cb"); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := os.Setenv(service_const.DotEnvJWTExpiration, "3600"); err != nil {
+		t.Fatal(err)
+	}
+
 	defer func() {
-		os.Unsetenv(service_const.DotEnvJWTSecret)
-		os.Unsetenv(service_const.DotEnvJWTExpiration)
+		if err := os.Unsetenv(service_const.DotEnvJWTSecret); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.Unsetenv(service_const.DotEnvJWTExpiration); err != nil {
+			t.Fatal(err)
+		}
 	}()
 
 	jwtService, err := NewJWTService()
@@ -157,7 +197,9 @@ func TestJWTService_GenerateAndParseToken(t *testing.T) {
 	})
 
 	t.Run("expired token", func(t *testing.T) {
-		os.Setenv(service_const.DotEnvJWTExpiration, "1")
+		if err = os.Setenv(service_const.DotEnvJWTExpiration, "1"); err != nil {
+			t.Fatal(err)
+		}
 		shortJWTService, err := NewJWTService()
 		assert.NoError(t, err)
 
