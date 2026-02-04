@@ -6,21 +6,10 @@ info:
 servers:
   - url: http://localhost:8080
 
-security:
-  - BearerAuth: []
-
-components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
 paths:
   /auth/register:
     post:
       summary: Register anyone(client/model/admin)
-      security: []
       tags: [ Auth ]
       requestBody:
         required: true
@@ -59,7 +48,6 @@ paths:
   /auth/login:
     post:
       summary: Login
-      security: []
       tags: [ Auth ]
       requestBody:
         required: true
